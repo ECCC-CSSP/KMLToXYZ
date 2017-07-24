@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="BathymetryModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="CHSCharts">
+          <Key>
+            <PropertyRef Name="CHSChartID" />
+          </Key>
+          <Property Name="CHSChartID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CHSChartName" Type="nvarchar" MaxLength="50" />
+          <Property Name="CHSFileName" Type="nvarchar" MaxLength="50" />
+          <Property Name="CHSPlaceName" Type="nvarchar" MaxLength="100" />
+          <Property Name="LongitudeMin" Type="float" />
+          <Property Name="LongitudeMax" Type="float" />
+          <Property Name="LatitudeMin" Type="float" />
+          <Property Name="LatitudeMax" Type="float" />
+        </EntityType>
+        <EntityType Name="CHSDepths">
+          <Key>
+            <PropertyRef Name="CHSDepthID" />
+          </Key>
+          <Property Name="CHSDepthID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CHSChartID" Type="int" />
+          <Property Name="LineValue" Type="float" />
+          <Property Name="Longitude" Type="float" />
+          <Property Name="Latitude" Type="float" />
+          <Property Name="Depth" Type="float" />
+        </EntityType>
+        <EntityContainer Name="BathymetryModelStoreContainer">
+          <EntitySet Name="CHSCharts" EntityType="Self.CHSCharts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CHSDepths" EntityType="Self.CHSDepths" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BathymetryModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="CHSChart">
+          <Key>
+            <PropertyRef Name="CHSChartID" />
+          </Key>
+          <Property Name="CHSChartID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CHSChartName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CHSFileName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CHSPlaceName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="LongitudeMin" Type="Double" />
+          <Property Name="LongitudeMax" Type="Double" />
+          <Property Name="LatitudeMin" Type="Double" />
+          <Property Name="LatitudeMax" Type="Double" />
+        </EntityType>
+        <EntityType Name="CHSDepth">
+          <Key>
+            <PropertyRef Name="CHSDepthID" />
+          </Key>
+          <Property Name="CHSDepthID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CHSChartID" Type="Int32" />
+          <Property Name="LineValue" Type="Double" />
+          <Property Name="Longitude" Type="Double" />
+          <Property Name="Latitude" Type="Double" />
+          <Property Name="Depth" Type="Double" />
+        </EntityType>
+        <EntityContainer Name="BathymetryEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="CHSCharts" EntityType="Self.CHSChart" />
+          <EntitySet Name="CHSDepths" EntityType="Self.CHSDepth" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="BathymetryModelStoreContainer" CdmEntityContainer="BathymetryEntities">
+          <EntitySetMapping Name="CHSCharts">
+            <EntityTypeMapping TypeName="BathymetryModel.CHSChart">
+              <MappingFragment StoreEntitySet="CHSCharts">
+                <ScalarProperty Name="CHSChartID" ColumnName="CHSChartID" />
+                <ScalarProperty Name="CHSChartName" ColumnName="CHSChartName" />
+                <ScalarProperty Name="CHSFileName" ColumnName="CHSFileName" />
+                <ScalarProperty Name="CHSPlaceName" ColumnName="CHSPlaceName" />
+                <ScalarProperty Name="LongitudeMin" ColumnName="LongitudeMin" />
+                <ScalarProperty Name="LongitudeMax" ColumnName="LongitudeMax" />
+                <ScalarProperty Name="LatitudeMin" ColumnName="LatitudeMin" />
+                <ScalarProperty Name="LatitudeMax" ColumnName="LatitudeMax" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CHSDepths">
+            <EntityTypeMapping TypeName="BathymetryModel.CHSDepth">
+              <MappingFragment StoreEntitySet="CHSDepths">
+                <ScalarProperty Name="CHSDepthID" ColumnName="CHSDepthID" />
+                <ScalarProperty Name="CHSChartID" ColumnName="CHSChartID" />
+                <ScalarProperty Name="LineValue" ColumnName="LineValue" />
+                <ScalarProperty Name="Longitude" ColumnName="Longitude" />
+                <ScalarProperty Name="Latitude" ColumnName="Latitude" />
+                <ScalarProperty Name="Depth" ColumnName="Depth" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
