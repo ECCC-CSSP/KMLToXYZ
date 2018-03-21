@@ -14,7 +14,6 @@ namespace KMLToXYZ
 {
     public partial class KMLtoXYZ : Form
     {
-        BathymetryEntities be = new BathymetryEntities();
         List<ColorVal> ColorValList = new List<ColorVal>();
 
         XmlDocument xmlDoc;
@@ -263,102 +262,6 @@ namespace KMLToXYZ
 
         }
 
-        //private bool CreateBMPWFile(XmlNode n)
-        //{
-        //    string FN = "";
-        //    string FullFN = "";
-        //    string North = "";
-        //    string South = "";
-        //    string East = "";
-        //    string West = "";
-
-        //    foreach (XmlNode cn in n.ChildNodes)
-        //    {
-        //        if (cn.Name.ToLower() == "icon")
-        //        {
-        //            foreach(XmlNode cn2 in cn.ChildNodes)
-        //            {
-        //                if (cn2.Name.ToLower() == "href")
-        //                {
-        //                    FN = cn2.InnerText;
-        //                }
-        //            }
-        //        }
-        //        if (cn.Name.ToLower() == "latlonbox")
-        //        {
-        //            foreach(XmlNode cn2 in cn.ChildNodes)
-        //            {
-        //                if (cn2.Name.ToLower() == "north")
-        //                {
-        //                    North = cn2.InnerText;
-        //                }
-        //                if (cn2.Name.ToLower() == "south")
-        //                {
-        //                    South = cn2.InnerText;
-        //                }
-        //                if (cn2.Name.ToLower() == "east")
-        //                {
-        //                    East = cn2.InnerText;
-        //                }
-        //                if (cn2.Name.ToLower() == "west")
-        //                {
-        //                    West = cn2.InnerText;
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    if (FN == "" || North == "" || South == "" || East == "" || West == "")
-        //    {
-        //        MessageBox.Show(string.Format("Error while parsing kml file. For a particular GroundOverlay href [{0}] north [{1}] south [{2}] east [{3}] west [{4}]", FN, North, South, East, West));
-        //        return false;
-        //    }
-
-        //    if (FN.Contains(@"\") == true)
-        //    {
-        //        FullFN = openFileDialog1.FileName.Substring(0, openFileDialog1.FileName.LastIndexOf("\\")) + @"\" + FN.Substring(FN.LastIndexOf("\\")+1);
-        //    }
-        //    else if (FN.Contains(@"/") == true)
-        //    {
-        //        FullFN = openFileDialog1.FileName.Substring(0, openFileDialog1.FileName.LastIndexOf(@"\")) + @"\" + FN.Substring(FN.LastIndexOf(@"/") + 1);
-        //    }
-        //    else
-        //    {
-        //        FullFN = openFileDialog1.FileName.Substring(0, openFileDialog1.FileName.LastIndexOf("\\")) + @"\" + FN;
-        //    }
-
-        //    FileInfo fi = new FileInfo(FullFN);
-
-        //    if (!fi.Exists)
-        //    {
-        //        MessageBox.Show(string.Format("Could not find file [{0}]\r\nPlease make sure Groud Overlay bmp files are on the same directory of the kml file.", FullFN));
-        //        return false;
-        //    }
-
-        //    fi = new FileInfo(FullFN + "W");
-
-        //    StreamWriter sw = fi.CreateText();
-
-        //    sw.WriteLine(string.Format(@"// Created     : {0:yyyy-MM-dd hh:mm:ss}", DateTime.Now));
-        //    sw.WriteLine(@"// DLL id      : C:\Program Files\DHI\2009\bin\pfs2004.dll");
-        //    sw.WriteLine(@"// PFS version : Mar 15 2009 20:08:49");
-        //    sw.WriteLine();
-        //    sw.WriteLine(@"[MIKE_0_Graphical_Images]");
-        //    sw.WriteLine(@"   [World_Coordinates]");
-        //    sw.WriteLine(string.Format(@"      x0 = {0}", West));
-        //    sw.WriteLine(string.Format(@"      y0 = {0}", South));
-        //    sw.WriteLine(string.Format(@"      x1 = {0}", East));
-        //    sw.WriteLine(string.Format(@"      y1 = {0}", North));
-        //    sw.WriteLine(@"   EndSect  // World_Coordinates");
-        //    sw.WriteLine();
-        //    sw.WriteLine(@"EndSect  // MIKE_0_Graphical_Images");
-
-        //    sw.Close();
-
-        //    return true;
-
-        //}
-
         private List<dPoint> ParseKMLCoordinates(StringBuilder sbCoordinates, double Z)
         {
             List<dPoint> dPoints = new List<dPoint>();
@@ -502,17 +405,20 @@ namespace KMLToXYZ
 
         private void KMLtoXYZ_Load(object sender, EventArgs e)
         {
-            List<BathName> BathyNameList = (from b in be.CHSCharts
-                                            where !b.CHSChartName.Contains("SOUNDG")
-                                            orderby b.CHSChartName
-                                            select new BathName
-                                            {
-                                                ID = b.CHSChartID,
-                                                Name = b.CHSChartName
-                                            }).ToList<BathName>();
+            using (BathymetryEntities be = new BathymetryEntities())
+            {
+                List<BathName> BathyNameList = (from b in be.CHSCharts
+                                                where !b.CHSChartName.Contains("SOUNDG")
+                                                orderby b.CHSChartName
+                                                select new BathName
+                                                {
+                                                    ID = b.CHSChartID,
+                                                    Name = b.CHSChartName
+                                                }).ToList<BathName>();
 
-            listBoxChartNames.DataSource = BathyNameList;
-            ColorValList = FillColorValues();
+                listBoxChartNames.DataSource = BathyNameList;
+                ColorValList = FillColorValues();
+            }
         }
 
         private void butCreateKML_Click(object sender, EventArgs e)
@@ -527,25 +433,27 @@ namespace KMLToXYZ
             {
                 di.Create();
             }
-            
+
             foreach (BathName bn in listBoxChartNames.SelectedItems)
             {
                 lblStatusTxt2.Text = "Doing " + bn.Name;
                 lblStatusTxt2.Refresh();
                 Application.DoEvents();
 
-
-                if (checkBoxIncludeSounds.Checked == true)
+                using (BathymetryEntities be = new BathymetryEntities())
                 {
-                    chsChartList = (from c in be.CHSCharts
-                                where c.CHSChartName.StartsWith(bn.Name)
-                                select c).ToList<CHSChart>();
-                }
-                else
-                {
-                    chsChartList = (from c in be.CHSCharts
-                                where c.CHSChartName == bn.Name
-                                select c).ToList<CHSChart>();
+                    if (checkBoxIncludeSounds.Checked == true)
+                    {
+                        chsChartList = (from c in be.CHSCharts
+                                        where c.CHSChartName.StartsWith(bn.Name)
+                                        select c).ToList<CHSChart>();
+                    }
+                    else
+                    {
+                        chsChartList = (from c in be.CHSCharts
+                                        where c.CHSChartName == bn.Name
+                                        select c).ToList<CHSChart>();
+                    }
                 }
 
                 if (chsChartList.Count == 0)
@@ -566,18 +474,21 @@ namespace KMLToXYZ
 
                     if (chs.CHSChartName.Contains("SOUNDG"))
                     {
-                       TopOfKML(sb, chs.CHSChartName);
+                        TopOfKML(sb, chs.CHSChartName);
 
                         lblStatusTxt2.Text = "Doing " + chs.CHSChartName + " ... loading data from DB this could take a minute.";
                         lblStatusTxt2.Refresh();
                         Application.DoEvents();
 
-                        chsDepthList = (from cd in be.CHSDepths
-                                        where cd.CHSChartID == chs.CHSChartID
-                                        && cd.LineValue == -999
-                                        && cd.Depth >= 0
-                                        orderby cd.Depth, cd.LineValue
-                                        select cd).ToList<CHSDepth>();
+                        using (BathymetryEntities be = new BathymetryEntities())
+                        {
+                            chsDepthList = (from cd in be.CHSDepths
+                                            where cd.CHSChartID == chs.CHSChartID
+                                            && cd.LineValue == -999
+                                            && cd.Depth >= 0
+                                            orderby cd.Depth, cd.LineValue
+                                            select cd).ToList<CHSDepth>();
+                        }
 
                         int CountDepth = 0;
                         foreach (CHSDepth d in chsDepthList.OrderBy(d => d.Depth))
@@ -623,12 +534,15 @@ namespace KMLToXYZ
                         lblStatusTxt2.Refresh();
                         Application.DoEvents();
 
-                        chsDepthList = (from cd in be.CHSDepths
-                                        where cd.CHSChartID == chs.CHSChartID
-                                        && cd.Depth >= 0
-                                        orderby cd.Depth, cd.LineValue
-                                        select cd).ToList<CHSDepth>();
+                        using (BathymetryEntities be = new BathymetryEntities())
+                        {
+                            chsDepthList = (from cd in be.CHSDepths
+                                            where cd.CHSChartID == chs.CHSChartID
+                                            && cd.Depth >= 0
+                                            orderby cd.Depth, cd.LineValue
+                                            select cd).ToList<CHSDepth>();
 
+                        }
 
                         double OldLineValue = -999;
                         int CountDepth = 0;
@@ -707,18 +621,20 @@ namespace KMLToXYZ
                 lblStatusTxt2.Refresh();
                 Application.DoEvents();
 
-
-                if (checkBoxIncludeSounds.Checked == true)
+                using (BathymetryEntities be = new BathymetryEntities())
                 {
-                    chsChartList = (from c in be.CHSCharts
-                                    where c.CHSChartName.StartsWith(bn.Name)
-                                    select c).ToList<CHSChart>();
-                }
-                else
-                {
-                    chsChartList = (from c in be.CHSCharts
-                                    where c.CHSChartName == bn.Name
-                                    select c).ToList<CHSChart>();
+                    if (checkBoxIncludeSounds.Checked == true)
+                    {
+                        chsChartList = (from c in be.CHSCharts
+                                        where c.CHSChartName.StartsWith(bn.Name)
+                                        select c).ToList<CHSChart>();
+                    }
+                    else
+                    {
+                        chsChartList = (from c in be.CHSCharts
+                                        where c.CHSChartName == bn.Name
+                                        select c).ToList<CHSChart>();
+                    }
                 }
 
                 if (chsChartList.Count == 0)
@@ -745,12 +661,16 @@ namespace KMLToXYZ
                         lblStatusTxt2.Refresh();
                         Application.DoEvents();
 
-                        chsDepthList = (from cd in be.CHSDepths
-                                        where cd.CHSChartID == chs.CHSChartID
-                                        && cd.LineValue == -999
-                                        && cd.Depth >= 0
-                                        orderby cd.Depth, cd.LineValue
-                                        select cd).ToList<CHSDepth>();
+                        using (BathymetryEntities be = new BathymetryEntities())
+                        {
+                            chsDepthList = (from cd in be.CHSDepths
+                                            where cd.CHSChartID == chs.CHSChartID
+                                            && cd.LineValue == -999
+                                            && cd.Depth >= 0
+                                            orderby cd.Depth, cd.LineValue
+                                            select cd).ToList<CHSDepth>();
+
+                        }
 
                         int CountDepth = 0;
                         foreach (CHSDepth d in chsDepthList.OrderBy(d => d.Depth))
@@ -762,25 +682,8 @@ namespace KMLToXYZ
                             double SoundBlockSize = double.Parse(textBoxBlockSize.Text);
                             Application.DoEvents();
 
-                            //sb.AppendLine(@"		<Placemark>");
-                            //sb.AppendLine(@"			<name>-" + d.Depth + "</name>");
-                            //sb.AppendLine(@"			<styleUrl>#" + GetColorStyleID((double)d.Depth, ColorValList) + "</styleUrl>");
-                            //sb.AppendLine(@"		    <LineString>");
-                            //sb.AppendLine(@"				<tessellate>1</tessellate>");
-                            //sb.AppendLine(@"			    <coordinates>");
-                            //sb.Append(string.Format("{0},{1},0 ", d.Longitude - SoundBlockSize, d.Latitude - SoundBlockSize));
-                            //sb.Append(string.Format("{0},{1},0 ", d.Longitude - SoundBlockSize, d.Latitude + SoundBlockSize));
-                            //sb.Append(string.Format("{0},{1},0 ", d.Longitude + SoundBlockSize, d.Latitude + SoundBlockSize));
-                            //sb.Append(string.Format("{0},{1},0 ", d.Longitude + SoundBlockSize, d.Latitude - SoundBlockSize));
-                            //sb.Append(string.Format("{0},{1},0 ", d.Longitude - SoundBlockSize, d.Latitude - SoundBlockSize));
-                            //sb.AppendLine();
-                            //sb.AppendLine(@"			    </coordinates>");
-                            //sb.AppendLine(@"	        </LineString>");
-                            //sb.AppendLine(@"		</Placemark>");
-
-                            sb.AppendLine(string.Format("{0},{1},-{2} ", d.Longitude, d.Latitude, d.Depth));
+                            sb.AppendLine(string.Format("{0},{1},{2} ", d.Longitude, d.Latitude, (d.Depth*-1.0f)));
                         }
-                        //BottomOfKML(sb);
 
                         StreamWriter sw = File.CreateText(textBoxDirectoryPath.Text + bn.Name + "SOUNDG.xyz");
                         sw.Write(sb);
@@ -792,20 +695,19 @@ namespace KMLToXYZ
                     }
                     else
                     {
-                        //TopOfKML(sb, chs.CHSChartName);
 
                         lblStatusTxt2.Text = "Doing " + chs.CHSChartName + " ... loading data from DB this could take a minute.";
                         lblStatusTxt2.Refresh();
                         Application.DoEvents();
 
-                        chsDepthList = (from cd in be.CHSDepths
-                                        where cd.CHSChartID == chs.CHSChartID
-                                        //&& cd.Depth >= 0
-                                        //orderby cd.Depth, cd.LineValue
-                                        select cd).ToList<CHSDepth>();
+                        using (BathymetryEntities be = new BathymetryEntities())
+                        {
+                            chsDepthList = (from cd in be.CHSDepths
+                                            where cd.CHSChartID == chs.CHSChartID
+                                            select cd).ToList<CHSDepth>();
 
+                        }
 
-                        //double OldLineValue = -999;
                         int CountDepth = 0;
                         foreach (CHSDepth cd in chsDepthList)
                         {
@@ -813,45 +715,9 @@ namespace KMLToXYZ
                             lblStatusTxt2.Text = "Doing " + bn.Name + " --- " + CountDepth;
                             lblStatusTxt2.Refresh();
                             Application.DoEvents();
-                            //if (cd.LineValue != OldLineValue)
-                            //{
-                            //    if (CountDepth != 1)
-                            //    {
-                            //        sb.AppendLine();
-                            //        sb.AppendLine(@"				</coordinates>");
-                            //        sb.AppendLine(@"			</LineString>");
-                            //        sb.AppendLine(@"		</Placemark>");
-                            //    }
 
-                            //    OldLineValue = (double)cd.LineValue;
-
-                            //    sb.AppendLine(@"		<Placemark>");
-                            //    if (cd.Depth == 0)
-                            //    {
-                            //        sb.AppendLine(@"			<name>" + cd.Depth + "</name>");
-                            //    }
-                            //    else
-                            //    {
-                            //        sb.AppendLine(@"			<name>-" + cd.Depth + "</name>");
-                            //    }
-                            //    sb.AppendLine(@"			<styleUrl>#" + GetColorStyleID((double)cd.Depth, ColorValList) + "</styleUrl>");
-                            //    sb.AppendLine(@"			<LineString>");
-                            //    sb.AppendLine(@"				<tessellate>1</tessellate>");
-                            //    sb.AppendLine(@"				<coordinates>");
-                            //}
-                            //else
-                            //{
-                            //    sb.Append(string.Format("{0},{1},0 ", cd.Longitude, cd.Latitude));
-                            //}
-                            sb.AppendLine(string.Format("{0},{1},-{2} ", cd.Longitude, cd.Latitude, cd.Depth));
+                            sb.AppendLine(string.Format("{0},{1},{2} ", cd.Longitude, cd.Latitude, (cd.Depth*-1.0f)));
                         }
-                        //sb.AppendLine();
-                        //sb.AppendLine(@"				</coordinates>");
-                        //sb.AppendLine(@"			</LineString>");
-                        //sb.AppendLine(@"		</Placemark>");
-
-
-                        //BottomOfKML(sb);
 
                         StreamWriter sw = File.CreateText(textBoxDirectoryPath.Text + bn.Name + ".xyz");
                         sw.Write(sb);
@@ -965,21 +831,76 @@ namespace KMLToXYZ
             return sb.ToString();
         }
 
-    }
-    class ColorVal
-    {
-        public double Value { get; set; }
-        public string ColorHexStr { get; set; }
-    }
-    public class BathName
-    {
-        public BathName()
+        private void butCreateAllXYZ_Click(object sender, EventArgs e)
         {
-            ID = 0;
-            Name = "";
-        }
+            double SoundBlockSize = double.Parse(textBoxBlockSize.Text);
 
-        public int ID { get; set; }
-        public string Name { get; set; }
+            List<CHSChart> chsChartList = new List<CHSChart>();
+            List<CHSDepth> chsDepthList = new List<CHSDepth>();
+
+            // checking if the directory exist if not should create the directory
+            DirectoryInfo di = new DirectoryInfo(textBoxDirectoryPath.Text);
+
+            if (!di.Exists)
+            {
+                di.Create();
+            }
+
+            using (BathymetryEntities be = new BathymetryEntities())
+            {
+                chsChartList = (from c in be.CHSCharts select c).OrderBy(c => c.CHSChartName).ToList<CHSChart>();
+            }
+
+            foreach (CHSChart chs in chsChartList)
+            {
+                StringBuilder sb = new StringBuilder();
+
+                lblStatusTxt2.Text = "Doing " + chs.CHSChartName + " ... loading data from DB this could take a minute.";
+                lblStatusTxt2.Refresh();
+                Application.DoEvents();
+
+                using (BathymetryEntities be = new BathymetryEntities())
+                {
+                    chsDepthList = (from cd in be.CHSDepths
+                                    where cd.CHSChartID == chs.CHSChartID
+                                    select cd).ToList<CHSDepth>();
+                }
+
+                int CountDepth = 0;
+                foreach (CHSDepth d in chsDepthList.OrderBy(d => d.Depth))
+                {
+                    CountDepth += 1;
+                    if (CountDepth % 1000 == 0)
+                    {
+                        lblStatusTxt2.Text = "Doing " + chs.CHSChartName + " --- " + CountDepth;
+                        lblStatusTxt2.Refresh();
+                        Application.DoEvents();
+                    }
+
+                    sb.AppendLine(string.Format("{0},{1},{2} ", d.Longitude, d.Latitude, (d.Depth*-1.0f)));
+                }
+
+                StreamWriter sw = File.CreateText(textBoxDirectoryPath.Text + chs.CHSChartName + ".xyz");
+                sw.Write(sb);
+                sw.Flush();
+                sw.Close();
+            }
+        }
     }
+}
+class ColorVal
+{
+    public double Value { get; set; }
+    public string ColorHexStr { get; set; }
+}
+public class BathName
+{
+    public BathName()
+    {
+        ID = 0;
+        Name = "";
+    }
+
+    public int ID { get; set; }
+    public string Name { get; set; }
 }

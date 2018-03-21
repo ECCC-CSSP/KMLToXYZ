@@ -62,6 +62,8 @@
             this.lblStatusTxt2 = new System.Windows.Forms.Label();
             this.checkBoxIncludeSounds = new System.Windows.Forms.CheckBox();
             this.lblSelectItem = new System.Windows.Forms.Label();
+            this.butCreateAllXYZ = new System.Windows.Forms.Button();
+            this.butCreateXYZ = new System.Windows.Forms.Button();
             this.butCreateKML = new System.Windows.Forms.Button();
             this.richTextBoxKMLFile = new System.Windows.Forms.RichTextBox();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -69,7 +71,6 @@
             this.lblFileStoragePath = new System.Windows.Forms.Label();
             this.textBoxDirectoryPath = new System.Windows.Forms.TextBox();
             this.tabPageGetXYZ = new System.Windows.Forms.TabPage();
-            this.butCreateXYZ = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -416,6 +417,7 @@
             this.splitContainer6.Panel1.Controls.Add(this.lblStatusTxt2);
             this.splitContainer6.Panel1.Controls.Add(this.checkBoxIncludeSounds);
             this.splitContainer6.Panel1.Controls.Add(this.lblSelectItem);
+            this.splitContainer6.Panel1.Controls.Add(this.butCreateAllXYZ);
             this.splitContainer6.Panel1.Controls.Add(this.butCreateXYZ);
             this.splitContainer6.Panel1.Controls.Add(this.butCreateKML);
             // 
@@ -469,6 +471,26 @@
             this.lblSelectItem.Size = new System.Drawing.Size(182, 13);
             this.lblSelectItem.TabIndex = 1;
             this.lblSelectItem.Text = "Select an item from the list first    than";
+            // 
+            // butCreateAllXYZ
+            // 
+            this.butCreateAllXYZ.Location = new System.Drawing.Point(455, 54);
+            this.butCreateAllXYZ.Name = "butCreateAllXYZ";
+            this.butCreateAllXYZ.Size = new System.Drawing.Size(114, 31);
+            this.butCreateAllXYZ.TabIndex = 0;
+            this.butCreateAllXYZ.Text = "Create All XYZ";
+            this.butCreateAllXYZ.UseVisualStyleBackColor = true;
+            this.butCreateAllXYZ.Click += new System.EventHandler(this.butCreateAllXYZ_Click);
+            // 
+            // butCreateXYZ
+            // 
+            this.butCreateXYZ.Location = new System.Drawing.Point(102, 46);
+            this.butCreateXYZ.Name = "butCreateXYZ";
+            this.butCreateXYZ.Size = new System.Drawing.Size(76, 31);
+            this.butCreateXYZ.TabIndex = 0;
+            this.butCreateXYZ.Text = "Create XYZ";
+            this.butCreateXYZ.UseVisualStyleBackColor = true;
+            this.butCreateXYZ.Click += new System.EventHandler(this.butCreateXYZ_Click);
             // 
             // butCreateKML
             // 
@@ -525,7 +547,7 @@
             this.textBoxDirectoryPath.Name = "textBoxDirectoryPath";
             this.textBoxDirectoryPath.Size = new System.Drawing.Size(174, 20);
             this.textBoxDirectoryPath.TabIndex = 0;
-            this.textBoxDirectoryPath.Text = "C:\\CSSP\\Bathymetry\\";
+            this.textBoxDirectoryPath.Text = "E:\\CSSP\\Bathymetry\\";
             // 
             // tabPageGetXYZ
             // 
@@ -537,16 +559,6 @@
             this.tabPageGetXYZ.TabIndex = 1;
             this.tabPageGetXYZ.Text = "Get XYZ";
             this.tabPageGetXYZ.UseVisualStyleBackColor = true;
-            // 
-            // butCreateXYZ
-            // 
-            this.butCreateXYZ.Location = new System.Drawing.Point(102, 46);
-            this.butCreateXYZ.Name = "butCreateXYZ";
-            this.butCreateXYZ.Size = new System.Drawing.Size(76, 31);
-            this.butCreateXYZ.TabIndex = 0;
-            this.butCreateXYZ.Text = "Create XYZ";
-            this.butCreateXYZ.UseVisualStyleBackColor = true;
-            this.butCreateXYZ.Click += new System.EventHandler(this.butCreateXYZ_Click);
             // 
             // KMLtoXYZ
             // 
@@ -645,6 +657,7 @@
         private System.Windows.Forms.Label lblBlockSize;
         private System.Windows.Forms.TextBox textBoxBlockSize;
         private System.Windows.Forms.Button butCreateXYZ;
+        private System.Windows.Forms.Button butCreateAllXYZ;
     }
 }
 
